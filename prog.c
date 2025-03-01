@@ -1,65 +1,64 @@
 #include <stdio.h>
 #include <getopt.h>
+#include <string.h>
 
 int main(int argc, char* argv[]){
+    opterr = 0;         //Убираем вывод об ошибке самого getopt
     struct option elbrus_options[] = {
-    {"elbrus1c+", no_argument, NULL,'1'}, {"elbrus=2c+", no_argument, NULL, '2'}, {"elbrus=2c3", no_argument, NULL, '3'}, {"elbrus=4c", no_argument, NULL,
-    '4'}, {"elbrus=8c", no_argument, NULL, '8'}, {"elbrus=16c", no_argument, NULL, '6'}, {0, 0, 0, 0}
+    {"elbrus", required_argument, NULL,'e'}, {0, 0, 0, 0}       //Вводим длинный (--) аргумент elbrus
     };
-
-    int opt = getopt_long(argc, argv, "mcst", elbrus_options, NULL);
-    if (opt == -1){
-        printf("Options are incorrect.");   //Обработка неккоректного случая
-        return 0;
-    } 
-    
-    printf("Options are correct: ");
+    const char* ARGUMENTS[] = {"1c+", "2c+", "2c3", "4c", "8c", "16c"}; //Доступные значения аргументов для elbrus a
+    int opt = getopt_long(argc, argv, "mcst", elbrus_options, NULL);    //Получение первого флага
+   
+    printf("Options are correct: ");    //Вывод о том, что опция корректна
     do{
         switch(opt){
             case 'm':
-                printf("m");
+                printf("m");    //Вывод опции "m"
                 break;
             case 'c':
-                printf("c");
+                printf("c");    //"c"
                 break;
             case 's':
-                printf("s");
+                printf("s");    //"s"
                 break;
             case 't':
-                printf("t");
+                printf("t");    //"t"
                 break;
-            case '1':
-                printf("elbrus=1c+");
+            case 'e':           //Случай, когда elbrus, потому что мы его обозначили 'e'
+                int flag_good_arg = 0;      //Флаг проверки на хороший аргумент
+                size_t cnt_arguments = sizeof(ARGUMENTS) / sizeof(ARGUMENTS[0]);    //Количество аргументов, подходящих эльбрусу
+                for (int i = 0; i < cnt_arguments; ++i){
+                   if (strcmp(ARGUMENTS[i], optarg) == 0){      //Нашли нужный аргумент в списке доступных
+                    printf("elbrus=%s", optarg);
+                    flag_good_arg = 1;      //Все окей!)
+                   }
+                }
+                if (flag_good_arg == 0){
+                    printf("Argument is incorrect");   //Обработка неккоректного аргумента
+                    return 1;
+                }
                 break;
-            case '2':
-                printf("elbrus=2c+");
-                break;
-            case '3':
-                printf("elbrus=2c3");
-                break;
-            case '4':
-                printf("elbrus=4c");
-                break;
-            case '6':
-                printf("elbrus=8c");
-                break;
-            case '8':
-                printf("elbrus=16c");
-                break;
+            case '?':
+                printf("\rOptions are incorrect. Incorrect option is: -%c\n", optopt);   //Доп. задание (вывод некорректной опции, в optopt записывает getopt при некорректной опции, а 
+                // \r возвращает в начало строки вывода)
+                return 2;
             default:
+                printf("\rOptions are incorrect.\n");   //Не повезло с командой (нет аргументов вообще)
+                return 3;
                 break;
         }
-        printf(", ");
-    }while ( (opt = getopt_long(argc, argv, "mcst", elbrus_options, NULL) ) != -1);
+        printf(", ");   //Для красивого вывода
+    }while ( (opt = getopt_long(argc, argv, "mcst", elbrus_options, NULL) ) != -1);     //Идем до конца по аргументам
     
-    if (optind < argc){
+    if (optind < argc){     //Пишем остальные строки не-опции
         printf("non options: ");
         while (optind < argc){
             if (optind != argc - 1){
                  printf("%s, ", argv[optind++]);
-            }else printf("%s\n", argv[optind++]);
+            }else printf("%s\n", argv[optind++]);       //На последней красивый вывод
         }
     }
-    else printf("non options: \"nothing\" \n");
+    else printf("non options: \"nothing\" \n");         //Если у нас только опции
     return 0;
 }
