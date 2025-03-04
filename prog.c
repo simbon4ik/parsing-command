@@ -3,6 +3,10 @@
 #include <string.h>
 
 int main(int argc, char* argv[]){
+    if (argc == 1){      //Обработка запуска без аргументов
+            printf("hint: %s <filename>\n", argv[0]);
+            return -1;
+    }
     opterr = 0;         //Убираем вывод об ошибке самого getopt
     struct option elbrus_options[] = {
     {"elbrus", required_argument, NULL,'e'}, {0, 0, 0, 0}       //Вводим длинный (--) аргумент elbrus
