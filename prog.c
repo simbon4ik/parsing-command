@@ -4,7 +4,7 @@
 
 int main(int argc, char* argv[]){
     if (argc == 1){      //Обработка запуска без аргументов
-            printf("hint: %s <filename>\n", argv[0]);
+            printf("hint: %s -<arguments> or --<arguments>\n", argv[0]);
             return -1;
     }
     opterr = 0;         //Убираем вывод об ошибке самого getopt
